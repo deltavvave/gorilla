@@ -1,0 +1,2406 @@
+{
+    "Microsoft NNI": [
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.nn.pytorch.LayerChoice(*args, **kwargs)[source]¶\nLayer choice selects one of the candidates, then apply it on inputs and return results.\n\nIt allows users to put several candidate operations (e.g., PyTorch modules), one of them is chosen in each explored model.\n\nNew in v2.2: Layer choice can be nested.\n\nParameters:\ncandidates (list of nn.Module or OrderedDict) – A module list to be selected from.\n\nweights (list of float) – Prior distribution used in random sampling.\n\nlabel (str) – Identifier of the layer choice.\n\nlength¶\nDeprecated. Number of ops to choose from. len(layer_choice) is recommended.\n\nType:\nint\n\nnames¶\nNames of candidates.\n\nType:\nlist of str\n\nchoices¶\nDeprecated. A list of all candidate modules in the layer choice module. list(layer_choice) is recommended, which will serve the same purpose.\n\nType:\nlist of Module\n\nExamples\n\n# import nni.nas.nn.pytorch as nn\n# declared in `__init__` method\nself.layer = nn.LayerChoice([\n    ops.PoolBN('max', channels, 3, stride, 1),\n    ops.SepConv(channels, channels, 3, stride, 1),\n    nn.Identity()\n])\n# invoked in `forward` method\nout = self.layer(x)\nNotes\n\ncandidates can be a list of modules or a ordered dict of named modules, for example,\n\nself.op_choice = LayerChoice(OrderedDict([\n    (\"conv3x3\", nn.Conv2d(3, 16, 128)),\n    (\"conv5x5\", nn.Conv2d(5, 16, 128)),\n    (\"conv7x7\", nn.Conv2d(7, 16, 128))\n]))\nElements in layer choice can be modified or deleted. Use del self.op_choice[\"conv5x5\"] or self.op_choice[1] = nn.Conv3d(...). Adding more choices is not supported yet.\n\nproperty candidates: Dict[str, Module] | List[Module]¶\nRestore the candidates parameters passed to the constructor. Useful when creating a new layer choices based on this one.",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "candidates",
+                    "value": "list of nn.Module or OrderedDict - A module list to be selected from."
+                },
+                {
+                    "name": "weights",
+                    "value": "list of float - Prior distribution used in random sampling."
+                },
+                {
+                    "name": "label",
+                    "value": "str - Identifier of the layer choice."
+                }
+            ],
+            "functionality": "Layer choice selects one of the candidates, then apply it on inputs and return results.",
+            "example_code": "# import nni.nas.nn.pytorch as nn\n# declared in `__init__` method\nself.layer = nn.LayerChoice([\n    ops.PoolBN('max', channels, 3, stride, 1),\n    ops.SepConv(channels, channels, 3, stride, 1),\n    nn.Identity()\n])\n# invoked in `forward` method\nout = self.layer(x)"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.nn.pytorch.InputChoice(*args, **kwargs)[source]¶\nInput choice selects n_chosen inputs from choose_from (contains n_candidates keys).\n\nIt is mainly for choosing (or trying) different connections. It takes several tensors and chooses n_chosen tensors from them. When specific inputs are chosen, InputChoice will become ChosenInputs.\n\nUse reduction to specify how chosen inputs are reduced into one output. A few options are:\n\nnone: do nothing and return the list directly.\n\nsum: summing all the chosen inputs.\n\nmean: taking the average of all chosen inputs.\n\nconcat: concatenate all chosen inputs at dimension 1.\n\nWe don’t support customizing reduction yet.\n\nParameters:\nn_candidates (int) – Number of inputs to choose from. It is required.\n\nn_chosen (int) – Recommended inputs to choose. If None, mutator is instructed to select any.\n\nreduction (str) – mean, concat, sum or none.\n\nweights (list of float) – Prior distribution used in random sampling.\n\nlabel (str) – Identifier of the input choice.\n\nExamples\n\n# import nni.nas.nn.pytorch as nn\n# declared in `__init__` method\nself.input_switch = nn.InputChoice(n_chosen=1)\n# invoked in `forward` method, choose one from the three\nout = self.input_switch([tensor1, tensor2, tensor3])\nforward(candidate_inputs)[source]¶\nThe forward of input choice is simply the first item of candidate_inputs. It shouldn’t be called directly by users in most cases.",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "n_candidates",
+                    "value": "int"
+                },
+                {
+                    "name": "n_chosen",
+                    "value": "int"
+                },
+                {
+                    "name": "reduction",
+                    "value": "str"
+                },
+                {
+                    "name": "weights",
+                    "value": "list of float"
+                },
+                {
+                    "name": "label",
+                    "value": "str"
+                }
+            ],
+            "functionality": "Input choice selects n_chosen inputs from choose_from (contains n_candidates keys). It takes several tensors and chooses n_chosen tensors from them. When specific inputs are chosen, InputChoice will become ChosenInputs. Use reduction to specify how chosen inputs are reduced into one output.",
+            "example_code": "# import nni.nas.nn.pytorch as nn\n# declared in `__init__` method\nself.input_switch = nn.InputChoice(n_chosen=1)\n# invoked in `forward` method, choose one from the three\nout = self.input_switch([tensor1, tensor2, tensor3])"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.nn.pytorch.Repeat(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "blocks",
+                    "value": "function, list of function, module or list of module"
+                },
+                {
+                    "name": "depth",
+                    "value": "int or tuple of int"
+                }
+            ],
+            "functionality": "Repeat a block by a variable number of times.",
+            "example_code": "self.blocks = nn.Repeat(Block(), 3)"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.nn.pytorch.Cell(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Cell structure that is popularly used in NAS literature.",
+            "example_code": "cell = nn.Cell([nn.Conv2d(32, 32, 3, padding=1), nn.MaxPool2d(3, padding=1)], 4, 1, 2)"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.nn.pytorch.ModelSpace(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "The base class for model search space based on PyTorch.",
+            "example_code": "class MyModelSpace(ModelSpace, label_prefix='backbone'):\n        def __init__(self):\n            super().__init__()\n\n            self.choice = self.add_mutable(nni.choice('depth', [2, 3, 4]))\n            print(self.choice.label)  # backbone/choice"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.nn.pytorch.ParametrizedModule(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "args",
+                    "value": "*args"
+                },
+                {
+                    "name": "kwargs",
+                    "value": "**kwargs"
+                }
+            ],
+            "functionality": "Subclass of MutableModule supports mutables as initialization parameters.",
+            "example_code": "class MyModule(ParametrizedModule):\n    def __init__(self, x):\n        super().__init__()\n        self.t = x   # Will be a fixed number, e.g., 3.\n\nMyModule(nni.choice('choice1', [1, 2, 3]))"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.nn.pytorch.MutableModule(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "PyTorch module, but with uncertainties.",
+            "example_code": "class MyModule(MutableModule):\n    def __init__(self):\n        super().__init__()\n        token_size = nni.choice('t', [4, 8, 16])        # Categorical variable here\n        self.add_mutable(token_size)                    # Register the mutable to this module.\n        real_token_size = ensure_frozen(token_size)     # Real number. 4 during dry run. 4, 8 or 16 during search.\n        self.token = nn.Parameter(torch.randn(real_token_size, 1))",
+            "required": [
+                "user_name",
+                "api_name",
+                "api_call",
+                "api_version",
+                "api_arguments",
+                "functionality",
+                "example_code"
+            ],
+            "definitions": {
+                "Arguments": {
+                    "title": "Arguments",
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "title": "Name",
+                            "description": "Name of the argument.",
+                            "type": "string"
+                        },
+                        "value": {
+                            "title": "Value",
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                },
+                                {
+                                    "type": "number"
+                                },
+                                {
+                                    "type": "boolean"
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer"
+                                    }
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "value"
+                    ]
+                }
+            }
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.NasBench101(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "stem_out_channels",
+                    "value": "Number of output channels of the stem convolution."
+                },
+                {
+                    "name": "num_stacks",
+                    "value": "Number of stacks in the network."
+                },
+                {
+                    "name": "num_modules_per_stack",
+                    "value": "Number of modules in each stack. Each module is a NasBench101Cell."
+                },
+                {
+                    "name": "max_num_vertices",
+                    "value": "Maximum number of vertices in each cell."
+                },
+                {
+                    "name": "max_num_edges",
+                    "value": "Maximum number of edges in each cell."
+                },
+                {
+                    "name": "num_labels",
+                    "value": "Number of categories for classification."
+                },
+                {
+                    "name": "bn_eps",
+                    "value": "Epsilon for batch normalization."
+                },
+                {
+                    "name": "bn_momentum",
+                    "value": "Momentum for batch normalization."
+                }
+            ],
+            "functionality": "The full search space proposed by NAS-Bench-101. It’s simply a stack of NasBench101Cell. Operations are conv3x3, conv1x1 and maxpool respectively.",
+            "example_code": "NasBench201"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.NasBench201(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "The full search space proposed by NAS-Bench-201. It’s a stack of NasBench201Cell.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.NASNet(*args, **kwargs)[source]",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "width",
+                    "value": "A fixed initial width or a tuple of widths to choose from."
+                },
+                {
+                    "name": "num_cells",
+                    "value": "A fixed number of cells (depths) to stack, or a tuple of depths to choose from."
+                },
+                {
+                    "name": "dataset",
+                    "value": "The essential differences are in “stem” cells, i.e., how they process the raw image input. Choosing “imagenet” means more downsampling at the beginning of the network."
+                },
+                {
+                    "name": "auxiliary_loss",
+                    "value": "If true, another auxiliary classification head will produce the another prediction. This makes the output of network two logits in the training phase."
+                },
+                {
+                    "name": "drop_path_prob",
+                    "value": "Apply drop path. Enabled when it’s set to be greater than 0."
+                }
+            ],
+            "functionality": "Search space proposed in Learning Transferable Architectures for Scalable Image Recognition.",
+            "example_code": "from nni.nas.hub.pytorch.nasnet import NDSStageDifferentiable\ndarts_strategy = strategy.DARTS(mutation_hooks=[NDSStageDifferentiable.mutate])",
+            "NASNET_OPS": [
+                "skip_connect",
+                "conv_3x1_1x3",
+                "conv_7x1_1x7",
+                "dil_conv_3x3",
+                "avg_pool_3x3",
+                "max_pool_3x3",
+                "max_pool_5x5",
+                "max_pool_7x7",
+                "conv_1x1",
+                "conv_3x3",
+                "sep_conv_3x3",
+                "sep_conv_5x5",
+                "sep_conv_7x7"
+            ]
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.nasnet.NDS(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "width",
+                    "value": "A fixed initial width or a tuple of widths to choose from."
+                },
+                {
+                    "name": "num_cells",
+                    "value": "A fixed number of cells (depths) to stack, or a tuple of depths to choose from."
+                },
+                {
+                    "name": "dataset",
+                    "value": "The essential differences are in “stem” cells, i.e., how they process the raw image input. Choosing “imagenet” means more downsampling at the beginning of the network."
+                },
+                {
+                    "name": "auxiliary_loss",
+                    "value": "If true, another auxiliary classification head will produce the another prediction. This makes the output of network two logits in the training phase."
+                },
+                {
+                    "name": "drop_path_prob",
+                    "value": "Apply drop path. Enabled when it’s set to be greater than 0."
+                },
+                {
+                    "name": "op_candidates",
+                    "value": "List of operator candidates. Must be from OPS."
+                },
+                {
+                    "name": "merge_op",
+                    "value": "See Cell."
+                },
+                {
+                    "name": "num_nodes_per_cell",
+                    "value": "See Cell."
+                },
+                {
+                    "name": "freeze(sample)[source]¶",
+                    "value": "Freeze the model according to the sample."
+                },
+                {
+                    "name": "set_drop_path_prob(drop_prob)[source]¶",
+                    "value": "Set the drop probability of Drop-path in the network. Reference: FractalNet: Ultra-Deep Neural Networks without Residuals."
+                }
+            ],
+            "functionality": "The unified version of NASNet search space.",
+            "example_code": "from nni.nas.hub.pytorch.nasnet import NDSStageDifferentiable\ndarts_strategy = strategy.DARTS(mutation_hooks=[NDSStageDifferentiable.mutate])"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.nasnet.NDSStage(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "This class defines NDSStage, a special type of Repeat, for isinstance check, and shape alignment.",
+            "example_code": "class NDSStage:\n    def __init__(self, *args, **kwargs):\n        pass"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.nasnet.NDSStagePathSampling(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "The path-sampling implementation (for one-shot) of each NDS stage if depth is mutating.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.nasnet.NDSStageDifferentiable(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "The differentiable implementation (for one-shot) of each NDS stage if depth is mutating.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.ENAS(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Search space proposed in Efficient neural architecture search via parameter sharing. It is built upon Cell, and implemented based on NDS. Its operator candidates are ENAS_OPS. It has 5 nodes per cell, and the output is concatenation of nodes not used as input to other nodes.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.AmoebaNet(*args, **kwargs)[source]",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Search space proposed in Regularized evolution for image classifier architecture search. It is built upon Cell, and implemented based on NDS. Its operator candidates are AMOEBA_OPS. It has 5 nodes per cell, and the output is concatenation of nodes not used as input to other nodes.",
+            "example_code": "from nni.nas.hub.pytorch.nasnet import NDSStageDifferentiable\ndarts_strategy = strategy.DARTS(mutation_hooks=[NDSStageDifferentiable.mutate])"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.PNAS(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Search space proposed in Progressive neural architecture search. It is built upon Cell, and implemented based on NDS. Its operator candidates are PNAS_OPS. It has 5 nodes per cell, and the output is concatenation of all nodes in the cell.",
+            "example_code": "from nni.nas.hub.pytorch.nasnet import NDSStageDifferentiable\ndarts_strategy = strategy.DARTS(mutation_hooks=[NDSStageDifferentiable.mutate])"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.DARTS(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Search space proposed in Darts: Differentiable architecture search. It is built upon Cell, and implemented based on NDS. Its operator candidates are DARTS_OPS. It has 4 nodes per cell, and the output is concatenation of all nodes in the cell. Note: none is not included in the operator candidates. It has already been handled in the differentiable implementation of cell. Notes: To use NDS spaces with one-shot strategies, especially when depth is mutating (i.e., num_cells is set to a tuple / list), please use NDSStagePathSampling (with ENAS and RandomOneShot) and NDSStageDifferentiable (with DARTS and Proxyless) into mutation_hooks. This is because the output shape of each stacked block in NDSStage can be different. For example: from nni.nas.hub.pytorch.nasnet import NDSStageDifferentiable darts_strategy = strategy.DARTS(mutation_hooks=[NDSStageDifferentiable.mutate]) Parameters: width – A fixed initial width or a tuple of widths to choose from. num_cells – A fixed number of cells (depths) to stack, or a tuple of depths to choose from. dataset – The essential differences are in “stem” cells, i.e., how they process the raw image input. Choosing “imagenet” means more downsampling at the beginning of the network. auxiliary_loss – If true, another auxiliary classification head will produce the another prediction. This makes the output of network two logits in the training phase. drop_path_prob – Apply drop path. Enabled when it’s set to be greater than 0. DARTS_OPS = ['max_pool_3x3', 'avg_pool_3x3', 'skip_connect', 'sep_conv_3x3', 'sep_conv_5x5', 'dil_conv_3x3', 'dil_conv_5x5']¶ The candidate operations. ProxylessNAS",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.ProxylessNAS(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "The search space proposed by ProxylessNAS.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.proxylessnas.InvertedResidual(in_channels, out_channels, expand_ratio, kernel_size=3, stride=1, squeeze_excite=None, norm_layer=None, activation_layer=None)[source]",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "in_channels",
+                    "value": "int | MutableExpression[int]"
+                },
+                {
+                    "name": "out_channels",
+                    "value": "int | MutableExpression[int]"
+                },
+                {
+                    "name": "expand_ratio",
+                    "value": "float | MutableExpression[float]"
+                },
+                {
+                    "name": "kernel_size",
+                    "value": "int | MutableExpression[int]"
+                },
+                {
+                    "name": "stride",
+                    "value": "int"
+                },
+                {
+                    "name": "squeeze_excite",
+                    "value": "Callable[[int | MutableExpression[int], int | MutableExpression[int]], Module] | None"
+                },
+                {
+                    "name": "norm_layer",
+                    "value": "Callable[[int], Module] | None"
+                },
+                {
+                    "name": "activation_layer",
+                    "value": "Callable[[...], Module] | None"
+                }
+            ],
+            "functionality": "An Inverted Residual Block, sometimes called an MBConv Block, is a type of residual block used for image models that uses an inverted structure for efficiency reasons.",
+            "example_code": "An Inverted Residual Block, sometimes called an MBConv Block, is a type of residual block used for image models that uses an inverted structure for efficiency reasons."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.MobileNetV3Space(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "num_labels",
+                    "value": "Dimensions for classification head."
+                },
+                {
+                    "name": "base_widths",
+                    "value": "Widths of each stage, from stem, to body, to head. Length should be 9, i.e., num_blocks + 1 (because there is a stem width in front)."
+                },
+                {
+                    "name": "width_multipliers",
+                    "value": "A range of widths multiplier to choose from. The choice is independent for each stage. Or it can be a fixed float. This will be applied on base_widths, and we would also make sure that widths can be divided by 8."
+                },
+                {
+                    "name": "expand_ratios",
+                    "value": "A list of expand ratios to choose from. Independent for every block."
+                },
+                {
+                    "name": "squeeze_excite",
+                    "value": "Indicating whether the current stage can have an optional SE layer. Expect array of length 6 for stage 0 to 5. Each element can be one of force, optional, none."
+                },
+                {
+                    "name": "depth_range (List[Tuple[int, int]])",
+                    "value": "A range (e.g., (1, 4)), or a list of range (e.g., [(1, 3), (1, 4), (1, 4), (1, 3), (0, 2)]). If a list, the length should be 5. The depth are specified for stage 1 to 5."
+                },
+                {
+                    "name": "stride",
+                    "value": "Stride for all stages (including stem and head). Length should be same as base_widths."
+                },
+                {
+                    "name": "activation",
+                    "value": "Activation (class) for all stages. Length is same as base_widths."
+                },
+                {
+                    "name": "se_from_exp",
+                    "value": "Calculate SE channel reduction from expanded (mid) channels."
+                },
+                {
+                    "name": "dropout_rate",
+                    "value": "Dropout rate at classification head."
+                },
+                {
+                    "name": "bn_eps",
+                    "value": "Epsilon of batch normalization."
+                },
+                {
+                    "name": "bn_momentum",
+                    "value": "Momentum of batch normalization."
+                }
+            ],
+            "functionality": "MobileNetV3Space implements the largest search space in TuNAS.",
+            "example_code": "Here is the following example code to use the API:\n\n```python\nfrom nni.nas.pytorch import mutables\n\n# Create a mutable object\nmutable = mutables.LayerChoice([nn.Conv2d(3, 64, 3, padding=1), nn.Conv2d(3, 128, 3, padding=1)])\n\n# Use the mutable object in your model\nmodel = nn.Sequential(\n    mutable,\n    nn.ReLU(),\n    nn.MaxPool2d(2),\n    nn.Flatten(),\n    nn.Linear(128 * 16 * 16, 10)\n)\n```\n"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.AutoFormer(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "search_embed_dim",
+                    "value": "The search space of embedding dimension. Use a list to specify search range."
+                },
+                {
+                    "name": "search_mlp_ratio",
+                    "value": "The search space of MLP ratio. Use a list to specify search range."
+                },
+                {
+                    "name": "search_num_heads",
+                    "value": "The search space of number of heads. Use a list to specify search range."
+                },
+                {
+                    "name": "search_depth",
+                    "value": "The search space of depth. Use a list to specify search range."
+                },
+                {
+                    "name": "img_size",
+                    "value": "Size of input image."
+                },
+                {
+                    "name": "patch_size",
+                    "value": "Size of image patch."
+                },
+                {
+                    "name": "in_channels",
+                    "value": "Number of channels of the input image."
+                },
+                {
+                    "name": "num_labels",
+                    "value": "Number of classes for classifier."
+                },
+                {
+                    "name": "qkv_bias",
+                    "value": "Whether to use bias item in the qkv embedding."
+                },
+                {
+                    "name": "drop_rate",
+                    "value": "Drop rate of the MLP projection in MSA and FFN."
+                },
+                {
+                    "name": "attn_drop_rate",
+                    "value": "Drop rate of attention."
+                },
+                {
+                    "name": "drop_path_rate",
+                    "value": "Drop path rate."
+                },
+                {
+                    "name": "pre_norm",
+                    "value": "Whether to use pre_norm. Otherwise post_norm is used."
+                },
+                {
+                    "name": "global_pooling",
+                    "value": "Whether to use global pooling to generate the image representation. Otherwise the cls_token is used."
+                },
+                {
+                    "name": "absolute_position",
+                    "value": "Whether to use absolute positional embeddings."
+                },
+                {
+                    "name": "qk_scale",
+                    "value": "The scaler on score map in self-attention."
+                },
+                {
+                    "name": "rpe",
+                    "value": "Whether to use relative position encoding."
+                },
+                {
+                    "name": "name",
+                    "value": "Search space size, must be one of {‘random-one-shot-tiny’, ‘random-one-shot-small’, ‘random-one-shot-base’}."
+                },
+                {
+                    "name": "download",
+                    "value": "Whether to download supernet weights."
+                },
+                {
+                    "name": "progress",
+                    "value": "Whether to display the download progress."
+                },
+                {
+                    "name": "name",
+                    "value": "Search space size, must be one of {‘autoformer-tiny’, ‘autoformer-small’, ‘autoformer-base’}."
+                },
+                {
+                    "name": "pretrained",
+                    "value": "Whether initialized with pre-trained weights."
+                },
+                {
+                    "name": "download",
+                    "value": "Whether to download supernet weights."
+                },
+                {
+                    "name": "progress",
+                    "value": "Whether to display the download progress."
+                }
+            ],
+            "functionality": "The search space that is proposed in AutoFormer. There are four searchable variables: depth, embedding dimension, heads number and MLP ratio.",
+            "example_code": "AutoFormer.load_pretrained_supernet('random-one-shot-tiny', download=True, progress=True)"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.modules.AutoActivation(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "unit_num",
+                    "value": "int"
+                },
+                {
+                    "name": "unary_candidates",
+                    "value": "list[str] | None"
+                },
+                {
+                    "name": "binary_candidates",
+                    "value": "list[str] | None"
+                },
+                {
+                    "name": "label",
+                    "value": "str | None"
+                }
+            ],
+            "functionality": "This module is an implementation of the paper Searching for Activation Functions.",
+            "example_code": "No example code provided."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.modules.NasBench101Cell(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "op_candidates",
+                    "value": "list of callable"
+                },
+                {
+                    "name": "in_features",
+                    "value": "int"
+                },
+                {
+                    "name": "out_features",
+                    "value": "int"
+                },
+                {
+                    "name": "projection",
+                    "value": "callable"
+                },
+                {
+                    "name": "max_num_nodes",
+                    "value": "int"
+                },
+                {
+                    "name": "max_num_edges",
+                    "value": "int"
+                },
+                {
+                    "name": "label",
+                    "value": "str"
+                }
+            ],
+            "functionality": "Cell structure that is proposed in NAS-Bench-101.",
+            "example_code": "class nni.nas.hub.pytorch.modules.NasBench101Cell(*args, **kwargs)[source]¶\nCell structure that is proposed in NAS-Bench-101.\n\nProposed by NAS-Bench-101: Towards Reproducible Neural Architecture Search.\n\nThis cell is usually used in evaluation of NAS algorithms because there is a “comprehensive analysis” of this search space available, which includes a full architecture-dataset that “maps 423k unique architectures to metrics including run time and accuracy”. You can also use the space in your own space design, in which scenario it should be possible to leverage results in the benchmark to narrow the huge space down to a few efficient architectures.\n\nThe space of this cell architecture consists of all possible directed acyclic graphs on no more than max_num_nodes nodes, where each possible node (other than IN and OUT) has one of op_candidates, representing the corresponding operation. Edges connecting the nodes can be no more than max_num_edges. To align with the paper settings, two vertices specially labeled as operation IN and OUT, are also counted into max_num_nodes in our implementation, the default value of max_num_nodes is 7 and max_num_edges is 9.\n\nInput of this cell should be of shape \n, while output should be \n. The shape of each hidden nodes will be first automatically computed, depending on the cell structure. Each of the op_candidates should be a callable that accepts computed num_features and returns a Module. For example,\n\ndef conv_bn_relu(num_features):\n    return nn.Sequential(\n        nn.Conv2d(num_features, num_features, 1),\n        nn.BatchNorm2d(num_features),\n        nn.ReLU()\n    )\nThe output of each node is the sum of its input node feed into its operation, except for the last node (output node), which is the concatenation of its input hidden nodes, adding the IN node (if IN and OUT are connected).\n\nWhen input tensor is added with any other tensor, there could be shape mismatch. Therefore, a projection transformation is needed to transform the input tensor. In paper, this is simply a Conv1x1 followed by BN and ReLU. The projection parameters accepts in_features and out_features, returns a Module. This parameter has no default value, as we hold no assumption that users are dealing with images. An example for this parameter is,\n\ndef projection_fn(in_features, out_features):\n    return nn.Conv2d(in_features, out_features, 1)\nParameters:\nop_candidates (list of callable) – Operation candidates. Each should be a function accepts number of feature, returning nn.Module.\n\nin_features (int) – Input dimension of cell.\n\nout_features (int) – Output dimension of cell.\n\nprojection (callable) – Projection module that is used to preprocess the input tensor of the whole cell. A callable that accept input feature and output feature, returning nn.Module.\n\nmax_num_nodes (int) – Maximum number of nodes in the cell, input and output included. At least 2. Default: 7.\n\nmax_num_edges (int) – Maximum number of edges in the cell. Default: 9.\n\nlabel (str) – Identifier of the cell. Cell sharing the same label will semantically share the same choice.\n\nWarning\n\nNasBench101Cell is not supported for graph-based model format. It’s also not supported by most one-shot algorithms currently.\n\nforward(x)[source]¶\nForward of NasBench101Cell is unimplemented."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.hub.pytorch.modules.NasBench201Cell(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Cell structure that is proposed in NAS-Bench-201. Proposed by NAS-Bench-201: Extending the Scope of Reproducible Neural Architecture Search. This cell is a densely connected DAG with num_tensors nodes, where each node is tensor. For every , there is an edge from i-th node to j-th node. Each edge in this DAG is associated with an operation transforming the hidden state from the source node to the target node. All possible operations are selected from a predefined operation set, defined in op_candidates. Each of the op_candidates should be a callable that accepts input dimension and output dimension, and returns a Module. Input of this cell should be of shape , while output should be . For example, The space size of this cell would be , where  is the number of operation candidates, and  is defined by num_tensors."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.evaluator.FunctionalEvaluator(function, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "function",
+                    "value": "The full name of the function."
+                },
+                {
+                    "name": "arguments",
+                    "value": "Keyword arguments for the function other than model."
+                }
+            ],
+            "functionality": "Functional evaluator that directly takes a function and thus should be general. See Evaluator for instructions on how to write this function.",
+            "example_code": "N/A"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.evaluator.MutableEvaluator[source]¶\nEvaluators with tunable parameters by itself (e.g., learning rate).\n\nThe tunable parameters must be an argument of the evaluator’s instantiation, or an argument of the arguments’ instantiation and etc.\n\nTo use this feature, there are two requirements:\n\nThe evaluator must inherit MutableEvaluator rather than Evaluator.\n\nMake sure the init arguments have been saved in trace_kwargs, and the instance can be cloned with trace_copy. The easiest way is to wrap the evaluator with nni.trace(). If the mutable parameter exists somewhere in the nested instantiation. All the levels must all be wrapped with nni.trace().\n\nExamples\n\n>>> def get_data(shuffle): ...\n...\n>>> @nni.trace                                  # 1. must wrap here\n... class MyOwnEvaluator(MutableEvaluator):     # 2. must inherit MutableEvaluator\n...     def __init__(self, lr, data): ...\n...\n>>> evaluator = MyOwnEvaluator(\n...     lr=Categorical([0.1, 0.01]),      # the argument can be tunable\n...     data=nni.trace(get_data)(         # if there is mutable parameters inside, this must also have nni.trace\n...         shuffle=Categorical([False, True])\n...     )\n... )\n>>> evaluator.simplify()\n{'global/1': Categorical([0.1, 0.01], label='global/1'), 'global/2': Categorical([False, True], label='global/2')}\nfreeze(sample)[source]¶\nUpon freeze, MutableEvaluator will freeze all the mutable parameters (as well as nested parameters), and return a FrozenEvaluator.\n\nThe evaluator will not be fully initialized to save the memory, especially when parameters contain large objects such as datasets. To use the evaluator, call FrozenEvaluator.get() to get the full usable evaluator.\n\nReturn type:\nThe frozen evaluator.\nis_mutable()[source]¶\nWhether some arguments of the evaluator are mutable.\n\nAlthough the evaluator is mutable, it may contain no mutable parameters, i.e., all its parameters (including nested ones) are fixed values. Return false if there is none."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.evaluator.pytorch.Classification(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "criterion",
+                    "value": "nn.Module"
+                },
+                {
+                    "name": "learning_rate",
+                    "value": "float"
+                },
+                {
+                    "name": "weight_decay",
+                    "value": "float"
+                },
+                {
+                    "name": "optimizer",
+                    "value": "Optimizer"
+                },
+                {
+                    "name": "train_dataloaders",
+                    "value": "DataLoader"
+                },
+                {
+                    "name": "val_dataloaders",
+                    "value": "DataLoader or List of DataLoader"
+                },
+                {
+                    "name": "datamodule",
+                    "value": "LightningDataModule | None"
+                },
+                {
+                    "name": "export_onnx",
+                    "value": "bool"
+                },
+                {
+                    "name": "num_classes",
+                    "value": "int"
+                },
+                {
+                    "name": "trainer_kwargs",
+                    "value": "dict"
+                }
+            ],
+            "functionality": "Evaluator that is used for classification.",
+            "example_code": ">>> evaluator = Classification()\n\nTo use customized criterion and optimizer:\n\n>>> evaluator = Classification(nn.LabelSmoothingCrossEntropy, optimizer=torch.optim.SGD)\n\nExtra keyword arguments will be passed to trainer, some of which might be necessary to enable GPU acceleration:\n\n>>> evaluator = Classification(accelerator='gpu', devices=2, strategy='ddp')"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.evaluator.pytorch.ClassificationModule(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.evaluator.pytorch.Regression(*args, **kwargs)[source]¶\nEvaluator that is used for regression.\n\nAvailable callback metrics in Regression are:\n\ntrain_loss\n\ntrain_mse\n\nval_loss\n\nval_mse\n\nParameters:\ncriterion (nn.Module) – Class for criterion module (not an instance). default: nn.MSELoss\n\nlearning_rate (float) – Learning rate. default: 0.001\n\nweight_decay (float) – L2 weight decay. default: 0\n\noptimizer (Optimizer) – Class for optimizer (not an instance). default: Adam\n\ntrain_dataloaders (DataLoader) – Used in trainer.fit(). A PyTorch DataLoader with training samples. If the lightning_module has a predefined train_dataloader method this will be skipped.\n\nval_dataloaders (DataLoader or List of DataLoader) – Used in trainer.fit(). Either a single PyTorch Dataloader or a list of them, specifying validation samples. If the lightning_module has a predefined val_dataloaders method this will be skipped.\n\ndatamodule (LightningDataModule | None) – Used in trainer.fit(). See Lightning DataModule.\n\nexport_onnx (bool) – If true, model will be exported to model.onnx before training starts. default: true\n\ntrainer_kwargs (dict) – Optional keyword arguments passed to trainer. See Lightning documentation for details.\n\nExamples\n\n>>> evaluator = Regression()\nExtra keyword arguments will be passed to trainer, some of which might be necessary to enable GPU acceleration:\n\n>>> evaluator = Regression(gpus=1)",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "criterion",
+                    "value": "nn.Module"
+                },
+                {
+                    "name": "learning_rate",
+                    "value": "float"
+                },
+                {
+                    "name": "weight_decay",
+                    "value": "float"
+                },
+                {
+                    "name": "optimizer",
+                    "value": "Optimizer"
+                },
+                {
+                    "name": "train_dataloaders",
+                    "value": "DataLoader"
+                },
+                {
+                    "name": "val_dataloaders",
+                    "value": "DataLoader or List of DataLoader"
+                },
+                {
+                    "name": "datamodule",
+                    "value": "LightningDataModule | None"
+                },
+                {
+                    "name": "export_onnx",
+                    "value": "bool"
+                },
+                {
+                    "name": "trainer_kwargs",
+                    "value": "dict"
+                }
+            ],
+            "functionality": "Evaluator that is used for regression.",
+            "example_code": ">>> evaluator = Regression()\n\nExtra keyword arguments will be passed to trainer, some of which might be necessary to enable GPU acceleration:\n\n>>> evaluator = Regression(gpus=1)"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.evaluator.pytorch.RegressionModule(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.evaluator.pytorch.Trainer(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Traced version of pytorch_lightning.Trainer. See https://pytorch-lightning.readthedocs.io/en/stable/common/trainer.html",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.evaluator.pytorch.DataLoader(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.evaluator.pytorch.Lightning(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "lightning_module",
+                    "value": "LightningModule"
+                },
+                {
+                    "name": "trainer",
+                    "value": "Trainer"
+                },
+                {
+                    "name": "train_dataloders",
+                    "value": "Any | None"
+                },
+                {
+                    "name": "val_dataloaders",
+                    "value": "Any | None"
+                },
+                {
+                    "name": "datamodule",
+                    "value": "LightningDataModule | None"
+                },
+                {
+                    "name": "fit_kwargs",
+                    "value": "Dict[str, Any] | None"
+                },
+                {
+                    "name": "detect_interrupt",
+                    "value": "bool"
+                }
+            ],
+            "functionality": "Delegate the whole training to PyTorch Lightning.",
+            "example_code": "import nni\nfrom nni.nas.evaluator.pytorch.lightning import Lightning, LightningModule, Trainer, DataLoader"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.strategy.GridSearch",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "shuffle",
+                    "value": true
+                },
+                {
+                    "name": "seed",
+                    "value": null
+                }
+            ],
+            "functionality": "Traverse the search space and try all the possible combinations one by one.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.strategy.Random",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "dedup",
+                    "value": true
+                },
+                {
+                    "name": "seed",
+                    "value": null
+                }
+            ],
+            "functionality": "Random search on the search space.",
+            "example_code": "Random search on the search space."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.strategy.RegularizedEvolution",
+            "api_version": "1.0",
+            "api_arguments": {
+                "population_size": 100,
+                "sample_size": 25,
+                "mutation_prob": 0.05,
+                "crossover": false,
+                "dedup": true,
+                "seed": null
+            },
+            "functionality": "Algorithm for regularized evolution (i.e. aging evolution). Follows “Algorithm 1” in Real et al. “Regularized Evolution for Image Classifier Architecture Search”, with several enhancements.",
+            "example_code": "Sample in this algorithm are called individuals. Specifically, the first population_size individuals are randomly sampled from the search space, and the rest are generated via a selection and mutation process. While new individuals are added to the population, the oldest one is removed to keep the population size constant.",
+            "required": [
+                "user_name",
+                "api_name",
+                "api_call",
+                "api_version",
+                "api_arguments",
+                "functionality",
+                "example_code"
+            ],
+            "definitions": {
+                "Arguments": {
+                    "title": "Arguments",
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "title": "Name",
+                            "description": "Name of the argument.",
+                            "type": "string"
+                        },
+                        "value": {
+                            "title": "Value",
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                },
+                                {
+                                    "type": "number"
+                                },
+                                {
+                                    "type": "boolean"
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer"
+                                    }
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "value"
+                    ]
+                }
+            }
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.strategy.PolicyBasedRL(*, samples_per_update=20, replay_buffer_size=null, reward_for_invalid=null, policy_fn=null, update_kwargs=null, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "samples_per_update",
+                    "value": 20
+                },
+                {
+                    "name": "replay_buffer_size",
+                    "value": null
+                },
+                {
+                    "name": "reward_for_invalid",
+                    "value": null
+                },
+                {
+                    "name": "policy_fn",
+                    "value": null
+                },
+                {
+                    "name": "update_kwargs",
+                    "value": null
+                }
+            ],
+            "functionality": "Algorithm for policy-based reinforcement learning. This is a wrapper of algorithms provided in tianshou (PPO by default), and can be easily customized with other algorithms that inherit BasePolicy (e.g., REINFORCE as in this paper).",
+            "example_code": "No example code provided."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.strategy.TPE(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "The Tree-structured Parzen Estimator (TPE) is a sequential model-based optimization (SMBO) approach.",
+            "example_code": "None"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.strategy.base.Strategy(model_space=None, engine=None)[source]¶\nBase class for NAS strategies.\n\nTo explore a space with a strategy, use:\n\nstrategy = MyStrategy()\nstrategy(model_space, engine)\nThe strategy has a run() method, that defines the process of exploring a NAS space.\n\nStrategy is stateful. It might store information of the current initialize() and run() as member attributes. We do not allow run() a strategy twice with same, or different model spaces.\n\nSubclass should override _initialize() and _run(), as well as state_dict() and load_state_dict() for checkpointing.\n\nproperty engine: ExecutionEngine¶\nStrategy should use engine to submit models, listen to metrics, and do budget / concurrency control.\n\nThe engine is set by set_engine(), either manually, or by a NAS experiment.\n\nThe engine could be either a real engine, or a middleware that wraps a real engine. It doesn’t make any difference because their interface are the same.\n\nSee also\n\nnni.nas.execution.ExecutionEngine\n\ninitialize(model_space, engine)[source]¶\nInitialize the strategy.\n\nThis method should be called before run() to initialize some states.\n\nSome strategies might even mutate the model_space. They should return the mutated model space.\n\nload_state_dict() can be called after initialize() to restore the state of the strategy.\n\nSubclass override _initialize() instead of this method.\n\nlist_models(sort=True, limit=None)[source]¶\nList all the models that is ever searched by the engine.\n\nA typical use case of this is to get the top-performing models produced during run().\n\nThe default implementation uses list_models() to retrieve a list of models from the execution engine.\n\nParameters:\nsort (bool) – Whether to sort the models by their metric (in descending order). If sorted is true, only models with “Trained” status and non-None metric are returned.\n\nlimit (int | None) – Limit the number of models to return.\n\nReturn type:\nAn iterator of models.\n\nload_state_dict(state_dict)[source]¶\nLoad the state of the strategy. This is used for loading checkpoints.\n\nThe state of strategy is some variables that are related to the current exploration process. The loading is often done after initialize() and before run().\n\nproperty model_space: ExecutableModelSpace¶\nThe model space that strategy is currently exploring.\n\nIt should be the same one as the input argument of run(), but the property exists for convenience.\n\nSee also\n\nnni.nas.space.ExecutableModelSpace\n\nrun()[source]¶\nExplore the model space.\n\nThis should be the main part of a NAS experiment. Strategies decide how to explore the model space. They can submit models to engine for training and evaluation.\n\nThe strategy doesn’t have to wait for all the models it submits to finish training.\n\nThe caller of run() is responsible of setting the engine and model_space before calling run().\n\nSubclass override _run() instead of this method.\n\nstate_dict()[source]¶\nDump the state of the strategy.\n\nThis is used for checkpointing.",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "sort",
+                    "value": "bool"
+                },
+                {
+                    "name": "limit",
+                    "value": "int | None"
+                }
+            ],
+            "functionality": "Base class for NAS strategies. To explore a space with a strategy, use: strategy = MyStrategy() strategy(model_space, engine) The strategy has a run() method, that defines the process of exploring a NAS space.",
+            "example_code": "strategy = MyStrategy()\nstrategy(model_space, engine)\nstrategy.run()"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.strategy.middleware.Chain(strategy, *middlewares)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Chain a Strategy (main strategy) with several StrategyMiddleware.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.strategy.middleware.MedianStop[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Kill a running model when its best intermediate result so far is worse than the median of results of all completed models at the same number of intermediate reports.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.strategy.RandomOneShot(filter=None, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Train a super-net with uniform path sampling. See reference.",
+            "example_code": "model_space = MyModelSpace()\nevaluator = Classification(max_epochs=100)  # usually trained longer\nstrategy = RandomOneShot()\nNasExperiment(model_space, evaluator, strategy).run()  # pretrain the supernet\n\nevaluator = Classification(max_epochs=0)  # no training\nstrategy = RegularizedEvolution()\nNasExperiment(model_space, evaluator, strategy).run()  # search a subnet\n\n# After run RandomOneShot strategy\ntorch.save(model_space.state_dict(), '/path/to/somewhere')\n\n# Then load the pretrained supernet in a separate run\nmodel_space = MyModelSpace()\npre_strategy = RandomOneShot()\npre_strategy.mutate_model(model_space)\nmodel_space.load_state_dict(torch.load('/path/to/somewhere'))\n\nmodel_space.freeze({'layer1': 0, 'layer2': 1})"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.strategy.ENAS",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "batches_per_update",
+                    "value": 20
+                },
+                {
+                    "name": "log_prob_every_n_step",
+                    "value": 10
+                },
+                {
+                    "name": "replay_buffer_size",
+                    "value": null
+                },
+                {
+                    "name": "reward_metric_name",
+                    "value": null
+                },
+                {
+                    "name": "policy_fn",
+                    "value": null
+                },
+                {
+                    "name": "update_kwargs",
+                    "value": null
+                },
+                {
+                    "name": "warmup_epochs",
+                    "value": 0
+                },
+                {
+                    "name": "penalty",
+                    "value": null
+                }
+            ],
+            "functionality": "RL controller learns to generate the best network on a super-net. See ENAS paper.",
+            "example_code": "Example code not provided"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.strategy.DARTS",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "arc_learning_rate",
+                    "value": 0.0003
+                },
+                {
+                    "name": "gradient_clip_val",
+                    "value": null
+                },
+                {
+                    "name": "log_prob_every_n_step",
+                    "value": 10
+                },
+                {
+                    "name": "warmup_epochs",
+                    "value": 0
+                },
+                {
+                    "name": "penalty",
+                    "value": null
+                }
+            ],
+            "functionality": "Continuous relaxation of the architecture representation, allowing efficient search of the architecture using gradient descent. Reference.",
+            "example_code": "Replace modules with differentiable versions."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.strategy.GumbelDARTS",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "temperature",
+                    "value": {
+                        "type": "tuple",
+                        "values": [
+                            "1.0",
+                            "0.33"
+                        ]
+                    }
+                },
+                {
+                    "name": "**kwargs",
+                    "value": {
+                        "type": "object",
+                        "values": {
+                            "parameters": [
+                                "nni.nas.nn.pytorch.LayerChoice",
+                                "nni.nas.nn.pytorch.InputChoice",
+                                "nni.nas.nn.pytorch.ParametrizedModule",
+                                "nni.nas.nn.pytorch.Repeat",
+                                "nni.nas.nn.pytorch.Cell"
+                            ]
+                        }
+                    }
+                }
+            ],
+            "functionality": "Choose the best block by using Gumbel Softmax random sampling and differentiable training. See FBNet and SNAS.",
+            "example_code": "Example code to use the API"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.strategy.OneShotStrategy(mutation_hooks=None, **kwargs)[source]¶\nWrap an one-shot lightning module as a one-shot strategy.\n\nA one-shot strategy has the following workflow:\n\nMutate the model to a supernet. (The current implementation will do this inplace.)\n\nMutate the evaluator (must be written in Lightning). Core steps include: injecting the search logics into lightning module and process the dataloaders.\n\nSubmit the model and evaluator for training.\n\nNotes\n\nIn NNI, we try to separate the “search” part and “training” part in one-shot NAS. The “training” part is defined with evaluator interface (has to be lightning evaluator interface to work with oneshot). Since the lightning evaluator has already broken down the training into minimal building blocks, we can re-assemble them after combining them with the “search” part of a particular algorithm.\n\nAfter the re-assembling, this module has defined all the search + training. The experiment can use a lightning trainer (which is another part in the evaluator) to train this module, so as to complete the search process.\n\nParameters:\nmutation_hooks (list[MutationHook] | None) –\n\nExtra mutation hooks to support customized mutation on primitives other than built-ins.\n\nMutation hooks are callable that inputs an Module and returns a BaseSuperNetModule. They are invoked in traverse_and_mutate_submodules(), on each submodules. For each submodule, the hook list are invoked subsequently, the later hooks can see the result from previous hooks. The modules that are processed by mutation_hooks will be replaced by the returned module, stored in nas_modules, and be the focus of the NAS algorithm.\n\nThe hook list will be appended by default_mutation_hooks in each one-shot module.\n\nTo be more specific, the input arguments of a hook are four arguments:\n\na module that might be processed,\n\nname of the module in its parent module,\n\na memo dict whose usage depends on the particular algorithm.\n\nkeyword arguments (configurations).\n\nNote that the memo should be read/written by hooks. There won’t be any hooks called on root module.\n\nThe returned arguments can be also one of the three kinds:\n\ntuple of: BaseSuperNetModule or None, and boolean,\n\nboolean,\n\nBaseSuperNetModule or None.\n\nThe boolean value is suppress indicates whether the following hooks should be called. When it’s true, it suppresses the subsequent hooks, and they will never be invoked. Without boolean value specified, it’s assumed to be false. If a none value appears on the place of BaseSuperNetModule, it means the hook suggests to keep the module unchanged, and nothing will happen.\n\nAn example of mutation hook is given in no_default_hook(). However it’s recommended to implement mutation hooks by deriving BaseSuperNetModule, and add its classmethod mutate to this list.\n\n**kwargs (Any) – Extra keyword arguments passed to Strategy.\n\nconfigure_oneshot_module(training_module)[source]¶\nCreate the oneshot module, i.e., the “search” part of the algorithm.\n\nSubclass should override this.\n\ndefault_mutation_hooks()[source]¶\nOverride this to define class-default mutation hooks.\n\nlist_models(sort=True, limit=1)[source]¶\nGetting the best models searched by the one-shot strategy.\n\nThe behavior of which models will be chosen depends on the implementation of inner one-shot module.\n\nParameters:\nsort (bool) – Must be true.\n\nlimit (int | None) – The number of models to be returned. Only supports 1 for now.\n\nload_state_dict(state_dict)[source]¶\nLoad the state dict of one-shot strategy.\n\nmutate_evaluator(evaluator)[source]¶\nMutate the evaluator to the one used in one-shot.\n\nSpecifically, it:\n\nuses oneshot_module to wrap the module in evaluator.\n\ncalls preprocess_dataloader() to refuse the dataloaders.\n\nReturn type:\nThe mutated evaluator.\n\nmutate_model(model)[source]¶nConvert the model space to a supernet inplace.\n\nThe core of a one-shot strategy is usually a carefully-designed supernet, which encodes the sharing pattern and mechanism. create_supernet() transforms a model space into a one-shot supernet.\n\nMostly useful for debugging and supernet inspection.\n\nParameters:\nmodel (ModelSpaceType) – The model space to be transformed. The raw model space written in PyTorch.\n\nReturns:\nThe one-shot supernet.\n\nNote that the changes will take inplace.\n\nTherefore the returned model is the same as the input model.\n\nThe mutated model is still a ModelSpace instance.\n\nIn most cases, simplify() and freeze(sample) would still return the same result,\n\nwhich is convenient for follow-up search on the supernet.\n\nReturn type:\nModelSpaceType\n\nproperty oneshot_module: BaseOneShotLightningModule¶\nThe one-shot module created by one-shot strategy.\n\nOnly available after run() is called.\n\nrun_hook(hook, name, module, memo)[source]¶\nRun a single mutation hook.\n\nFor internal use only: subclass can override this to intercept the hooks for customization. For example, provide extra keyword arguments or tamper the memo.\n\nstate_dict()[source]¶\nGet the state dict of one-shot strategy.\n\nThe state dict of one-shot strategy leverages the checkpoint callback in Lightning evaluator. It will look for last_model_path attribute (or best_model_path) in trainer.checkpoint_callback, save it, and put it back into fit_kwargs when load_state_dict() is called.\n\nproperty supernet: ModelSpace¶\nThe supernet created by one-shot strategy.\n\nOnly available after run() is called.\n\ntrain_dataloader(train_dataloader_fn, val_dataloader_fn)[source]¶nOne-shot strategy typically requires fusing train and validation dataloader in an ad-hoc way. As one-shot strategy doesn’t try to open the blackbox of a batch, theoretically, these dataloader can be any dataloader types supported by Lightning.\n\nParameters:\ntrain_dataloader_fn (Callable[[], Any]) – Factory that takes no argument, returning a train dataloader.\n\nval_dataloader_fn (Callable[[], Any]) – Similar to train_dataloader_fn.\n\nReturn type:\nPreprocessed train dataloaders.\n\nval_dataloader(train_dataloader_fn, val_dataloader_fn)[source]¶nSee train_dataloader().\n\nReturn type:\nPreprocessed validation dataloaders.\n\nbase_lightning",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Wrap an one-shot lightning module as a one-shot strategy.",
+            "example_code": "mutation_hooks=None, **kwargs"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.base_lightning.BaseOneShotLightningModule(training_module)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "inner_module",
+                    "value": "pytorch_lightning.LightningModule"
+                }
+            ],
+            "functionality": "The base class for all one-shot NAS modules.",
+            "example_code": "BaseOneShotLightningModule is implemented as a subclass of Lightning, to be make it deceptively look like a lightning module to the trainer. It’s actually a wrapper of the lightning module in evaluator. The composition of different lightning modules is as follows:\n\nBaseOneShotLightningModule       <- Current class (one-shot logics)\n    |_ evaluator.LightningModule <- Part of evaluator (basic training logics)\n        |_ user's model          <- Model space, transformed to a supernet by current class.\n\nThe base class implemented several essential utilities, such as preprocessing user’s model, redirecting lightning hooks for user’s model, configuring optimizers and exporting NAS result are implemented in this class.\n\ntraining_module¶\nPyTorch lightning module, which defines the training recipe (the lightning module part in evaluator).\n\nParameters:\ninner_module (pytorch_lightning.LightningModule) – It’s a LightningModule that defines computations, train/val loops, optimizers in a single class. When used in NNI, the inner_module is the combination of instances of evaluator + base model (to be precise, a base model wrapped with LightningModule in evaluator).\n\nadvance_lr_schedulers(batch_idx)[source]¶\nAdvance the learning rates, when manual optimization is turned on.\n\nThe full implementation is here. We only include a partial implementation here. Advanced features like Reduce-lr-on-plateau are not supported.\n\nadvance_optimization(loss, batch_idx, gradient_clip_val=None, gradient_clip_algorithm=None)[source]¶nRun the optimizer defined in evaluators, when manual optimization is turned on.\n\nCall this method when the model should be optimized. To keep it as neat as possible, we only implement the basic zero_grad, backward, grad_clip, and step here. Many hooks and pre/post-processing are omitted. Inherit this method if you need more advanced behavior.\n\nThe full optimizer step could be found here. We only implement part of the optimizer loop here.\n\nParameters:\nbatch_idx (int) – The current batch index.\n\narchitecture_optimizers()[source]¶nGet the optimizers configured in configure_architecture_optimizers().\n\nReturn type would be LightningOptimizer or list of LightningOptimizer.\n\nconfigure_architecture_optimizers()[source]¶nHook kept for subclasses. A specific NAS method inheriting this base class should return its architecture optimizers here if architecture parameters are needed. Note that lr schedulers are not supported now for architecture_optimizers.\n\nReturn type:\nOptimizers used by a specific NAS algorithm. Return None if no architecture optimizers are needed.\n\nconfigure_optimizers()[source]¶nTransparently configure optimizers for the inner model, unless one-shot algorithm has its own optimizer (via configure_architecture_optimizers()), in which case, the optimizer will be appended to the list.\n\nThe return value is still one of the 6 types defined in PyTorch-Lightning.\n\nexport()[source]¶nExport the NAS result, ideally the best choice of each supernet_modules(). You may implement an export method for your customized supernet_modules().\n\nReturns:\nKeys are labels of mutables, and values are the choice indices of them.\n\nReturn type:\ndict\n\nexport_probs()[source]¶nExport the probability of every choice in the search space got chosen.\n\nNote\n\nIf such method of some modules is not implemented, they will be simply ignored.\n\nReturns:\nIn most cases, keys are labels of the mutables, while values are a dict, whose key is the choice and value is the probability of it being chosen.\n\nReturn type:\ndict\n\nlog_probs(probs)[source]¶nWrite the probability of every choice to the logger. (nothing related to log-probability stuff).\n\nParameters:\nprobs (Dict[str, Any]) – The result of export_probs().\n\nproperty model: ModelSpace¶nReturn the model space defined by the user.\n\nThe model space is not guaranteed to have been transformed into a one-shot supernet. For instance, when __init__ hasn’t completed, the model space will still be the original one.\n\npostprocess_weight_optimizers(optimizers)[source]¶nSome subclasss need to modify the original optimizers. This is where it should be done. For example, differentiable algorithms might not want the architecture weights to be inside the weight optimizers.\n\nReturn type:\nBy default, it return the original object.\n\nresample()[source]¶nTrigger the resample for each supernet_modules(). Sometimes (e.g., in differentiable cases), it does nothing.\n\nReturns:\nSampled architecture.\n\nReturn type:\ndict\n\nset_model(model)[source]¶nSet the model space to be searched.\n\nsupernet_modules()[source]¶nReturn all supernet modules in the model space."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.base_lightning.BaseSuperNetModule(*args, **kwargs)[source]¶\nMutated module in super-net. Usually, the feed-forward of the module itself is undefined. It has to be resampled with resample() so that a specific path is selected. (Sometimes, this is not required. For example, differentiable super-net.)\n\nA super-net module usually corresponds to one sample. But two exceptions:\n\nA module can have multiple parameter spec. For example, a convolution-2d can sample kernel size, channels at the same time.\n\nMultiple modules can share one parameter spec. For example, multiple layer choices with the same label.\n\nFor value choice compositions, the parameter spec are bounded to the underlying (original) value choices, rather than their compositions.\n\nexport(memo)[source]¶\nExport the final architecture within this module. It should have the same keys as search_space_spec().\n\nParameters:\nmemo (dict[str, Any]) – Use memo to avoid the same label gets exported multiple times.\n\nexport_probs(memo)[source]¶\nExport the probability / logits of every choice got chosen.\n\nParameters:\nmemo (dict[str, Any]) – Use memo to avoid the same label gets exported multiple times.\n\nclassmethod mutate(module, name, memo, mutate_kwargs)[source]¶\nThis is a mutation hook that creates a BaseSuperNetModule. The method should be implemented in each specific super-net module, because they usually have specific rules about what kind of modules to operate on.\n\nParameters:\nmodule (nn.Module) – The module to be mutated (replaced).\n\nname (str) – Name of this module. With full prefix. For example, module1.block1.conv.\n\nmemo (dict) – Memo to enable sharing parameters among mutated modules. It should be read and written by mutate functions themselves.\n\nmutate_kwargs (dict) – Algo-related hyper-parameters, and some auxiliary information.\n\nReturns:\nThe mutation result, along with an optional boolean flag indicating whether to suppress follow-up mutation hooks. See BaseOneShotLightningModule for details.\n\nReturn type:\nUnion[BaseSuperNetModule, bool, tuple[BaseSuperNetModule, bool]]\n\nresample(memo)[source]¶\nResample the super-net module.\n\nParameters:\nmemo (dict[str, Any]) – Used to ensure the consistency of samples with the same label.\n\nReturns:\nSampled result. If nothing new is sampled, it should return an empty dict.\n\nReturn type:\ndict\n\nsupermodule.differentiable",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Mutated module in super-net. Usually, the feed-forward of the module itself is undefined. It has to be resampled with resample() so that a specific path is selected. (Sometimes, this is not required. For example, differentiable super-net.)",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.differentiable.DifferentiableMixedCell(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Implementation of Cell under differentiable context. Similar to PathSamplingCell, this cell only handles cells of specific kinds (e.g., with loose end). An architecture parameter is created on each edge of the full-connected graph.",
+            "example_code": "None"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.differentiable.DifferentiableMixedInput(*args, **kwargs)[source]¶\nMixed input. Forward returns a weighted sum of candidates. Implementation is very similar to DifferentiableMixedLayer.",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "n_candidates",
+                    "value": "int - Expect number of input candidates."
+                },
+                {
+                    "name": "n_chosen",
+                    "value": "int - Expect numebr of inputs finally chosen."
+                },
+                {
+                    "name": "alpha",
+                    "value": "Tensor - Tensor that stores the “learnable” weights."
+                },
+                {
+                    "name": "softmax",
+                    "value": "nn.Module - Customizable softmax function. Usually nn.Softmax(-1)."
+                },
+                {
+                    "name": "label",
+                    "value": "str - Name of the choice."
+                }
+            ],
+            "functionality": "Iterate over architecture parameters. Not recursive.",
+            "example_code": "Choose the operator with the top n_chosen logits."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.differentiable.DifferentiableMixedLayer(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Mixed layer, in which fprop is decided by a weighted sum of several layers. Proposed in DARTS: Differentiable Architecture Search.",
+            "example_code": "",
+            "required": [
+                "user_name",
+                "api_name",
+                "api_call",
+                "api_version",
+                "api_arguments",
+                "functionality",
+                "example_code"
+            ],
+            "definitions": {
+                "Arguments": {
+                    "title": "Arguments",
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "title": "Name",
+                            "description": "Name of the argument.",
+                            "type": "string"
+                        },
+                        "value": {
+                            "title": "Value",
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                },
+                                {
+                                    "type": "number"
+                                },
+                                {
+                                    "type": "boolean"
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer"
+                                    }
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "value"
+                    ]
+                }
+            }
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.differentiable.DifferentiableMixedRepeat(*args, **kwargs)[source]¶\nImplementation of Repeat in a differentiable supernet. Result is a weighted sum of possible prefixes, sliced by possible depths.\n\nIf the output is not a single tensor, it will be summed at every independant dimension. See weighted_sum() for details.\n\narch_parameters()[source]¶\nIterate over architecture parameters. Not recursive.\n\nexport(memo)[source]¶\nChoose argmax for each leaf value choice.\n\nexport_probs(memo)[source]¶\nExport the weight for every leaf value choice.\n\nresample(memo)[source]¶\nDo nothing.",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Implementation of Repeat in a differentiable supernet. Result is a weighted sum of possible prefixes, sliced by possible depths.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.differentiable.GumbelSoftmax(dim=-1)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Wrapper of F.gumbel_softmax. dim = -1 by default.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.differentiable.MixedOpDifferentiablePolicy(operation, memo, mutate_kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Implements the differentiable sampling in mixed operation.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.sampling.MixedOpPathSamplingPolicy(operation, memo, mutate_kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Implements the path sampling in mixed operation.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.sampling.PathSamplingCell(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "The implementation of super-net cell follows DARTS.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.sampling.PathSamplingInput(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Mixed input. Take a list of tensor as input, select some of them and return the sum.",
+            "example_code": "Sampled input indices.\n\nType:\nint or list of int\n\nexport(memo)[source]¶\nRandom choose one name if label isn’t found in memo.\n\nresample(memo)[source]¶\nRandom choose one path / multiple paths if label is not found in memo. If one path is selected, only one integer will be in self._sampled. If multiple paths are selected, a list will be in self._sampled."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.sampling.PathSamplingLayer(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Mixed layer, in which fprop is decided by exactly one inner layer or sum of multiple (sampled) layers. If multiple modules are selected, the result will be summed and returned.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.sampling.PathSamplingRepeat(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Implementation of Repeat in a path-sampling supernet. Samples one / some of the prefixes of the repeated blocks.",
+            "example_code": "",
+            "definitions": {
+                "Arguments": {
+                    "title": "Arguments",
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "title": "Name",
+                            "description": "Name of the argument.",
+                            "type": "string"
+                        },
+                        "value": {
+                            "title": "Value",
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                },
+                                {
+                                    "type": "number"
+                                },
+                                {
+                                    "type": "boolean"
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer"
+                                    }
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "value"
+                    ]
+                }
+            }
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.proxyless.ProxylessMixedInput(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Proxyless version of differentiable input choice. See ProxylessMixedLayer for implementation details.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.proxyless.ProxylessMixedLayer(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Proxyless version of differentiable mixed layer. It resamples a single-path every time, rather than compute the weighted sum.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.proxyless.ProxylessMixedRepeat(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "ProxylessNAS converts repeat to a sequential blocks of layer choices between the original block and an identity layer. Only pure categorical depth choice is supported. If the categorical choices are not consecutive integers, the constraint will only be considered at export. Operations that support weight sharing at a fine-grained level, which is commonly known as super-kernel (as in channel search), or weight entanglement.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.operation.MixedBatchNorm2d(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "num_features",
+                    "value": ""
+                },
+                {
+                    "name": "eps",
+                    "value": "only supported in path sampling"
+                },
+                {
+                    "name": "momentum",
+                    "value": "only supported in path sampling"
+                }
+            ],
+            "functionality": "Mixed BatchNorm2d operation.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.operation.MixedConv2d(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "in_channels",
+                    "value": ""
+                },
+                {
+                    "name": "out_channels",
+                    "value": ""
+                },
+                {
+                    "name": "groups",
+                    "value": ""
+                },
+                {
+                    "name": "stride",
+                    "value": "only supported in path sampling"
+                },
+                {
+                    "name": "kernel_size",
+                    "value": ""
+                },
+                {
+                    "name": "padding",
+                    "value": ""
+                },
+                {
+                    "name": "dilation",
+                    "value": "only supported in path sampling"
+                }
+            ],
+            "functionality": "Mixed conv2d op.",
+            "example_code": "max_kernel = 5*5, sampled_kernel = 3*3, then we take [1: 4]\nmax_kernel = 5*5, sampled_kernel = 2*2, then we take [1: 3]\n□ □ □ □ □   □ □ □ □ □\n□ ■ ■ ■ □   □ ■ ■ □ □\n□ ■ ■ ■ □   □ ■ ■ □ □\n□ ■ ■ ■ □   □ □ □ □ □\n□ □ □ □ □   □ □ □ □ □"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.operation.MixedLayerNorm(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "normalized_shape",
+                    "value": ""
+                },
+                {
+                    "name": "eps",
+                    "value": "float"
+                }
+            ],
+            "functionality": "Mixed LayerNorm operation.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.operation.MixedLinear(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "in_features",
+                    "value": ""
+                },
+                {
+                    "name": "out_features",
+                    "value": ""
+                },
+                {
+                    "name": "Prefix of weight and bias will be sliced.",
+                    "value": ""
+                }
+            ],
+            "functionality": "Mixed linear operation.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.operation.MixedMultiHeadAttention(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Mixed multi-head attention.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.operation.MixedOperation(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "This is the base class for all mixed operations. It’s what you should inherit to support a new operation with mutable.",
+            "example_code": "No example code provided."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.supermodule.operation.MixedOperationSamplingPolicy(operation, memo, mutate_kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Algo-related part for mixed Operation. MixedOperation delegates its resample and export to this policy (or its subclass), so that one Operation can be easily combined with different kinds of sampling. One SamplingStrategy corresponds to one mixed operation. export(operation, memo)[source]¶ The handler of MixedOperation.export(). export_probs(operation, memo)[source]¶ The handler of MixedOperation.export_probs(). forward_argument(operation, name)[source]¶ Computing the argument with name used in operation’s forward. Usually a value, or a distribution of value. resample(operation, memo)[source]¶ The handler of MixedOperation.resample(). Profiler Utilities¶ Guide the one-shot strategy to sample architecture within a target latency. This module converts the profiling results returned by profiler to something that one-shot strategies can understand. For example, a loss or some penalty to the reward. This file is experimentally placed in the oneshot package. It might be moved to a more general place in the future.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.profiler.ExpectationProfilerPenalty(profiler, baseline, scale=1.0, *, nonlinear='linear', aggregate='add')[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "ProfilerPenalty for a sample with distributions. Value for each label is a a mapping from chosen value to probablity.",
+            "example_code": "profile(sample)[source]¶\nProfile based on a distribution of samples.\n\nEach value in the sample must be a dict representation a categorical distribution."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.oneshot.pytorch.profiler.SampleProfilerPenalty(profiler, baseline, scale=1.0, *, nonlinear='linear', aggregate='add')[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "ProfilerPenalty for a single sample. Value for each label is a specifically chosen value.",
+            "example_code": "profile(sample)[source]¶"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.experiment.NasExperiment(model_space, evaluator, strategy, config=None, id=None)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "model_space",
+                    "value": "BaseModelSpace"
+                },
+                {
+                    "name": "evaluator",
+                    "value": "Evaluator"
+                },
+                {
+                    "name": "strategy",
+                    "value": "Strategy"
+                },
+                {
+                    "name": "config",
+                    "value": "nni.nas.experiment.config.experiment.NasExperimentConfig"
+                },
+                {
+                    "name": "id",
+                    "value": "None"
+                }
+            ],
+            "functionality": "The entry for a NAS experiment. Users can use this class to start/stop or inspect an experiment, like exporting the results.",
+            "example_code": ">>> base_model = MobileNetV3Space()\n>>> search_strategy = strategy.Random()\n>>> model_evaluator = Classification()\n>>> exp = NasExperiment(base_model, model_evaluator, search_strategy)\n>>> exp_config.max_trial_number = 20\n>>> exp_config.training_service.use_active_gpu = False\n>>> exp.run(exp_config, 8081)\nExport top models and re-initialize the top model:\n\n>>> for model_dict in exp.export_top_models(formatter='dict'):\n...     print(model_dict)\n>>> with model_context(model_dict):\n...     final_model = Net()"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.experiment.config.CgoEngineConfig(name=None, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Engine for cross-graph optimization.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.experiment.config.ExecutionEngineConfig(name=None, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Base class for execution engine config. Useful for instance check.",
+            "exampl,e_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.experiment.config.GraphModelFormatConfig(name=None, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Model format config for graph-based model space.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.experiment.config.RawModelFormatConfig(name=None, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Model format that keeps the original model space.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.experiment.config.SequentialEngineConfig(name=None, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Engine that executes the models sequentially.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.experiment.config.SimplifiedModelFormatConfig(name=None, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Model format that simplifies the model space to a dict of labeled mutables.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.experiment.config.TrainingServiceEngineConfig(name=None, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Engine used together with NNI training service.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.profiler.Profiler(model_space)[source]",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "A class that profiles the performance of a model within a space.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.profiler.ExpressionProfiler(model_space)[source]",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Profiler whose profile() method is an evaluation of a precomputed expression.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.profiler.pytorch.flops.FlopsParamsCounterConfig(count_bias=true, count_normalization=true, count_activation=true)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "count_bias",
+                    "value": true
+                },
+                {
+                    "name": "count_normalization",
+                    "value": true
+                },
+                {
+                    "name": "count_activation",
+                    "value": true
+                }
+            ],
+            "functionality": "Configuration for counting FLOPs.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.profiler.pytorch.flops.FlopsParamsProfiler(model_space, args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "The profiler to count flops and parameters of a model.",
+            "example_code": "class nni.nas.profiler.pytorch.flops.FlopsParamsProfiler(model_space, args, **kwargs)[source]¶\nThe profiler to count flops and parameters of a model.\n\nIt first runs shape inference on the model to get the input/output shapes of all the submodules. Then it traverse the submodules and use registered formulas to count the FLOPs and parameters as an expression. The results are stored in a FlopsResult object. When a sample is provided, the expressions are frozen and the results are computed.\n\nNotes\n\nCustomized FLOPs formula can be registered by using register_flops_formula(). It takes three mandatory arguments: the module itself, input shapes as a tuple of MutableShape objects, and output shapes as a tuple of MutableShape objects. It also takes some additional keyword arguments:\n\nname: the name of the module in the PyTorch module hierarchy.\n\nshapes: a dictionary of all the input and output shapes of all the modules.\n\nconfig: the configuration object of FlopsParamsProfiler.\n\nIf fields in FlopsParamsCounterConfig are used in the formula, they will also be passed as keyword arguments.\n\nIt then returns a FlopsResult object that contains the FLOPs and parameters of the module.\n\nFor example, to count the FLOPs of a unbiased linear layer, we can register the following formula:\n\ndef linear_flops(module, input_shape, output_shape, *, name, shapes, config):\n    x, y = input_shape[0], output_shape[0]  # unpack the tuple\n    return FlopsResult(\n        flops=x[1:].numel() * module.out_features,  # forget the batch size\n        params=module.in_features * module.out_features\n    )\n\nregister_flops_formula(nn.Linear, linear_flops)\nParameters:\nmodel_space (ModelSpace) – The model space to profile.\n\nargs (Any) – Dummy inputs to the model to count flops. Similar to torch.onnx.export, the input can be a tensor or a tuple of tensors, or a tuple of arguments ends with a dictionary of keyword arguments.\n\n**kwargs – Additional configurations. See FlopsParamsCounterConfig for supported arguments."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.profiler.pytorch.flops.FlopsProfiler(model_space, args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "The FLOPs part of FlopsParamsProfiler.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.profiler.pytorch.flops.NumParamsProfiler(model_space, args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "model_space",
+                    "value": "ModelSpace"
+                },
+                {
+                    "name": "args",
+                    "value": "Any"
+                },
+                {
+                    "name": "**kwargs",
+                    "value": "Any"
+                }
+            ],
+            "functionality": "The parameters part of FlopsParamsProfiler.",
+            "example_code": "class nni.nas.profiler.pytorch.flops.NumParamsProfiler(model_space, args, **kwargs)[source]¶"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.profiler.pytorch.nn_meter.NnMeterProfiler(model_space, args, predictor, custom_leaf_types=None, simplify_shapes=False)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "model_space",
+                    "value": "ModelSpace"
+                },
+                {
+                    "name": "args",
+                    "value": "Any"
+                },
+                {
+                    "name": "predictor",
+                    "value": "str | nnMeterPredictor"
+                },
+                {
+                    "name": "custom_leaf_types",
+                    "value": "tuple[type, ...] | None"
+                },
+                {
+                    "name": "simplify_shapes",
+                    "value": "bool"
+                }
+            ],
+            "functionality": "Profiler based on nnMeter, which is a tool to estimate the latency of neural networks without real device. The profiler breaks the whole model into submodules and profiles each of them, introducing branches when some part of the model contains mutables. The latency of a module is the sum of the latency of its submodules. NnMeterProfiler does not respect is_leaf_module() when it profiles the latency of the model space. To control the granularity, inherit this class and override is_leaf_module().",
+            "example_code": "class NnMeterProfiler(NnMeter):\n    def __init__(self, model_space, args, predictor, custom_leaf_types=None, simplify_shapes=False):\n        super().__init__(model_space, args, predictor, custom_leaf_types, simplify_shapes)\n\n    def estimate_latency(self, name, module, shapes):\n        # implementation\n\n    def estimate_layerchoice_latency(self, name, module, shapes):\n        # implementation\n\n    def estimate_repeat_latency(self, name, module, shapes):\n        # implementation\n\n    def is_leaf_module(self, module):\n        # implementation\n\n    def combinations(self, module, input_shape):\n        # implementation\n\n    def sample_to_condition(self, mutables, sample):\n        # implementation\n\n    def to_onnx(self, model, example_inputs):\n        # implementation"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.space.BaseModelSpace",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "A model space is a collection of mutables, organized in a meaningful way (i.e., in a model way). BaseModelSpace is almost only used for isinstance check. A few utility functions might be provided inside this class for convenience.",
+            "example_code": "classmethod frozen_factory(sample)[source]¶\nGet a factory that creates a frozen model from this model space."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.space.ExecutableModelSpace(status=ModelStatus.Initialized)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Model space with an extra execute method that defines how the models should be evaluated.",
+            "example_code": "class nni.nas.space.ExecutableModelSpace(status=ModelStatus.Initialized)[source]¶\nModel space with an extra execute method that defines how the models should be evaluated. It should be ModelSpaceWithExecution but that’s too long.\n\nBoth model space, as well as single models mutated from the space, will be instances of ExecutableModelSpace. They only differ in the status flag (see ModelStatus).\n\nSince the single models that are directly evaluated are also of this type, this class has an execute() method which defines how the training pipeline works, i.e., how to assemble the evaluator and the model, and how to execute the training and evaluation.\n\nBy convention, only frozen models (status is ModelStatus.Frozen) and instances of ExecutableModelSpace can be sent to execution engine for training.\n\nIn most cases, ExecutableModelSpace only contains the necessary information that is required for NAS mutations and reconstruction of the original model. This makes the model space light-weighted, and easy to be serialized for sending to clusters. It also reforms the space to be more friendly to NAS algorithms (e.g., in the format of graphs).\n\nevaluator: Evaluator | None¶\nEvaluator that assesses the quality of the model.\n\nexecutable_model()[source]¶\nFully instantiate the deep learning model (e.g., PyTorch Module) so that it’s ready to be executed.\n\nexecutable_model() is usually symmetrical to from_model(). While from_model() converts deep learning model to ExecutableModelSpace, executable_model() converts ExecutableModelSpace back to deep learning model.\n\nReturns:\nTypical this method should return a PyTorch / Tensorflow model (or model factory),\n\ndepending on the input format of evaluator.\n\nReturn type:\nAny\n\nexecute()[source]¶\nExecute the training (and/or evaluation).\n\nclassmethod from_model(model_space, evaluator=None, **configs)[source]¶\nConvert any model space to a specific type of executable model space.\n\nParameters:\nmodel_space (BaseModelSpace) – Model space written in deep learning framework in most cases.\n\nevaluator (Evaluator | None) – A model usually requires an evaluator to be executable. But evaluator can sometimes be optional for debug purposes or to support fancy algorithms.\n\nconfigs (Any) – Additional configurations for the executable model space.\n\nReturn type:\nThe converted model space.\n\nproperty metric: TrialMetric | None¶\nTraining result of the model, or None if it’s not yet trained or has failed to train.\n\nmetrics: Metrics¶\nThe evaluation metrics of the model.\n\nsample: Sample | None¶\nThe sample that is used to freeze this model. It’s useful for debug and visualization. It could be left unset if sample is not used when freezing the model.\n\nIt’s supposed to be a dict which is previously known as architecture dict (however it can sometimes contain information about evaluator as well).\n\nSubclasses should set this attribute in freeze() if they want to use it. They may also set a sample different from what they received in freeze() if it’s intended.\n\nstatus: ModelStatus¶\nThe status of the model space / model."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.space.Graph(model, graph_id, name=None, _internal=False)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Graph topology.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.space.GraphModelSpace",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Represents a neural network model space with graph. Previously known as GraphModelSpace.",
+            "example_code": "class nni.nas.space.GraphModelSpace(*, _internal=False)[source]¶\nRepresents a neural network model space with graph. Previously known as GraphModelSpace.\n\nDuring mutation, one GraphModelSpace object is created for each trainable snapshot. For example, consider a mutator that insert a node at an edge for each iteration. In one iteration, the mutator invokes 4 primitives: add node, remove edge, add edge to head, add edge to tail. These 4 primitives operates in one GraphModelSpace object. When they are all done the model will be set to “frozen” (trainable) status and be submitted to execution engine. And then a new iteration starts, and a new GraphModelSpace object is created by forking last model.\n\nstatus¶\nSee ModelStatus.\n\nroot_graph¶\nThe outermost graph which usually takes dataset as input and feeds output to loss function.\n\ngraphs¶\nAll graphs (subgraphs) in this model.\n\nevaluator¶\nGraphModelSpace evaluator\n\nmutators¶\nList of mutators that are applied to this model.\n\nparent¶\nA Mutation object that contains the mutation that creates this model.\n\nmetrics¶\nIntermediate as well as final metrics.\n\ncheck_contains(sample)[source]¶\nCheck if the sample is contained in the model space.\n\nexport_placement_constraint()[source]¶\nExport the placement constraint used in training service.\n\nfork()[source]¶\nCreate a new model which has same topology, names, and IDs to current one.\n\nCan only be invoked on a frozen model. The new model will be in Mutating state.\n\nThis API is used in mutator base class.\n\nfreeze(sample)[source]¶\nFreeze the model by applying the sample to mutators.\n\nCan only be invoked on a mutating model. The new model will be in Frozen state.\n\nThis API is used in mutator base class.\n\nget_node_by_name(node_name)[source]¶\nTraverse all the nodes to find the matched node with the given name.\n\nget_node_by_python_name(python_name)[source]¶\nTraverse all the nodes to find the matched node with the given python_name.\n\nget_nodes()[source]¶\nTraverse through all the nodes.\n\nget_nodes_by_label(label)[source]¶\nTraverse all the nodes to find the matched node(s) with the given label. There could be multiple nodes with the same label. Name space name can uniquely identify a graph or node.\n\nNOTE: the implementation does not support the class abstraction\n\nget_nodes_by_type(type_name)[source]¶\nTraverse all the nodes to find the matched node(s) with the given type.\n\nproperty history: list[Mutation]¶\nMutation history.\n\nA record of where the model comes from. self comes from the mutation recorded in self.history[-1]. self.history[0] is the first mutation happened on the base graph.\n\nto_code()[source]¶\nConvert the model to code."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.space.Mutator(*, sampler=None, label=None)[source]¶ Mutates graphs in model to generate new model. By default, mutator simplifies to a single-value dict with its own label as key, and itself as value. At freeze, the strategy should provide a MutationSampler in the dict. This is because the freezing of mutator is dynamic (i.e., requires a variational number of random numbers, dynamic ranges for each random number), and the MutationSampler here can be considered as some random number generator to produce a random sequence based on the asks in Mutator.mutate(). On the other hand, a subclass mutator should implement Mutator.mutate(), which calls Mutator.choice() inside, and Mutator.choice() invokes the bounded sampler to “random” a choice. The label of the mutator in most cases is the label of the nodes on which the mutator is applied to. I imagine that mutating any model space (other than graph) might be useful, but we would postpone the support to when we actually need it. apply(model)[source]¶ Apply this mutator on a model. The model will be copied before mutation and the original model will not be modified. Return type: The mutated model. bind_model(model)[source]¶ Mutators need a model, based on which they generate new models. This context manager binds a model to the mutator, and unbinds it after the context. Examples >>> with mutator.bind_model(model): ... mutator.simplify() bind_sampler(sampler)[source]¶ Set the sampler which will handle Mutator.choice() calls. check_contains(sample)[source]¶ Check if the sample is valid for this mutator. See also nni.mutable.Mutable.check_contains choice(candidates)[source]¶ Ask sampler to make a choice. freeze(sample)[source]¶ When freezing a mutator, we need a model to mutate on, as well as a sampler to generate choices. As how many times the mutator is applied on the model is often variational, a sample with fixed length will not work. The dict values in sample should be a sampler inheriting MutationSampler. But there are also cases where simplify() converts the mutation process into some fixed operations (e.g., in StationaryMutator). In this case, sub-class should handle the freeze logic on their own. Mutator.freeze() needs to be called in a bind_model context. leaf_mutables(is_leaf)[source]¶ By default, treat self as a whole labeled mutable in the format dict. Sub-class can override this to dry run the mutation upon the model and return the mutated model for the followed-up dry run. See also nni.mutable.Mutable.leaf_mutables mutate(model)[source]¶ Abstract method to be implemented by subclass. Mutate a model in place. random(memo=None, random_state=None)[source]¶ Use a _RandomSampler that generates a random sample when mutates. See also nni.mutable.Mutable.random",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Mutates graphs in model to generate new model.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.space.MutatorSequence(mutators)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Apply a series of mutators on our model, sequentially.",
+            "example_code": "with mutator_list.bind_model(model):\n    mutator_list.freeze(samplers)"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.space.RawFormatModelSpace(model_space, evaluator)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Model space that keeps the original model and does no conversion of model format (in contrast to SimplifiedModelSpace or GraphModelSpace).",
+            "example_code": "from nni.nas.nn.pytorch import ModelSpace\nclass MyModelSpace(ModelSpace):\n    ...\n\nevaluator = FunctionEvaluator(evaluate_fn, learning_rate=nni.choice('lr', [0.1, 1.0]))\nmodel_space = RawFormatModelSpace(MyModelSpace(), evaluator)\nThe space can then be simplified and freezed:\n\nfrozen_model = model_space.freeze({'layer1': 0, 'lr': 0.1})\nThe frozen model can be instantiated and executed:\n\nmodel = frozen_model.executable_model()\nevaluator.evaluate(model)\nexecutable_model()[source]¶\nReturn a trainable deep learning model.\n\nCalling this method twice do not guarantee returning the same model instance. It might be two models with different weights. Memorizing the returning result if needed.\n\nSee also\n\nExecutableModelSpace.executable_model"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.execution.ExecutionEngine[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "The abstract interface of execution engine.",
+            "example_code": "No example code provided."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.execution.IntermediateMetricEvent(model, metric)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Event of a model update with intermediate metric.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.execution.ModelEventType(value)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Type of a model update event.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.execution.SequentialExecutionEngine(max_model_count=None, max_duration=None, continue_on_failure=False)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "The execution engine will run every model in the current process. If multiple models have been submitted, they will be queued and run sequentially.",
+            "example_code": "Keyboard interrupt will terminate the currently running model and raise to let the main process know."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.execution.TrainingEndEvent(model, status)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Event of a model update with training end.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.execution.TrainingServiceExecutionEngine(nodejs_binding, fetch_intermediates=True)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "The execution engine will submit every model onto training service.\n\nResource management is implemented in this class.\n\nThis engine doesn’t include any optimization across graphs.\n\nNOTE: Due to the design of nni.experiment, the execution engine resorts to NasExperiment to submit trials as well as waiting for results. This is not ideal, because this engine might be one of the very few engines which need the training service. Ideally, the training service should be a part of the execution engine, not the experiment.\n\nIdeally, this class should not have any states. Its save and load methods should be empty.\n\nParameters:\nnodejs_binding (NasExperiment) – The nodejs binding of the experiment.\n\nfetch_intermediates (bool) – Whether to fetch intermediate results from the training service when list models. Setting it to false for large-scale experiments can improve performance.\n\nbudget_available()[source]¶\nInfer the budget from resources.\n\nThis should have a dedicated implementation on the nodejs side in the future.\n\nidle_worker_available()[source]¶\nReturn the number of available resources.\n\nThe resource is maintained by the engine itself. It should be fetched from nodejs side directly in future.\n\nlist_models(status=None)[source]¶\nRetrieve models previously submitted.\n\nTo support a large-scale experiments with thousands of trials, this method will retrieve the models from the nodejs binding (i.e., from the database). The model instances will be re-created on the fly based on the data from database. Although they are the same models semantically, they might not be the same instances. Exceptions are those still used by the strategy. Their weak references are kept in the engine and thus the exact same instances are returned.\n\nParameters:\nstatus (ModelStatus | None) – The status of the models to be retrieved. If None, all models will be retrieved.\n\ninclude_intermediates – Whether to include intermediate models.\n\nsubmit_models(*models)[source]¶\nSubmit models to training service.\n\nSee also\n\nnni.nas.ExecutionEngine.submit_models\n\nwait_models(*models)[source]¶\nWait models to finish training.\n\nIf argument models is empty, wait for all models to finish. Using the experiment status as an indicator of all models’ status, which is more efficient.\n\nFor the models to receive status changes, the models must be the exact same instances as the ones submitted. Dumping and reloading the models, or retrieving the unsaved models from list_models() won’t work.\n\nCross-graph optimization",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.execution.cgo.CrossGraphOptimization(remote_config, max_concurrency=None, batch_waiting_time=60)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "remote_config",
+                    "value": "RemoteConfig"
+                },
+                {
+                    "name": "max_concurrency",
+                    "value": "int | None"
+                },
+                {
+                    "name": "batch_waiting_time",
+                    "value": "int"
+                }
+            ],
+            "functionality": "The execution engine middleware of Cross-Graph Optimization (CGO). It’s a technique that merges multiple models into one model for training speedup. See Retiarii paper for details.",
+            "example_code": "The models must be in the format of GraphModelSpace.\n\nThe evaluator has to be a Lightning evaluator.\n\nThe lightning_module argument of the evaluator must be an instance of MultiModelSupervisedLearningModule.\n\nThe trainer argument of the evaluator must be an instance of MultiModelTrainer.\n\nThere are also a number of limitations:\n\nCGO doesn’t support stop and resume a checkpoint.\n\nOnly remote training service is supported.\n\nAll model history are stored in memory. The experiment might not scale well."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.execution.cgo.MultiModelLightningModule(criterion, metric, n_models=None)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "The lightning module for a merged “multi-model”. The output of the multi-model is expected to be a tuple of tensors. The tensors will be each passed to a criterion and a metric. The loss will be added up for back propagation, and the metrics will be logged. The reported metric will be a list of metrics, one for each model.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.execution.cgo.MultiModelTrainer(*args, **kwargs)[source]",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "use_cgo",
+                    "value": "bool"
+                },
+                {
+                    "name": "trainer_kwargs",
+                    "value": "Optional keyword arguments passed to trainer. See Lightning documentation for details."
+                }
+            ],
+            "functionality": "Trainer for cross-graph optimization.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.benchmark.BenchmarkModelSpace(model_space: BenchmarkEvaluator)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.benchmark.BenchmarkModelSpace(model_space: BaseModelSpace)",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.benchmark.BenchmarkModelSpace(model_space: None, evaluator: BenchmarkEvaluator)",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Model space that is specialized for benchmarking. We recommend using this model space for benchmarking, for its validation and efficiency.",
+            "example_code": "BenchmarkModelSpace(evaluator)"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.benchmark.NasBench101Benchmark(num_epochs=108, metric='valid_acc', include_intermediates=False)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "num_epochs",
+                    "value": 108
+                },
+                {
+                    "name": "metric",
+                    "value": "valid_acc"
+                },
+                {
+                    "name": "include_intermediates",
+                    "value": false
+                }
+            ],
+            "functionality": "Benchmark evaluator for NAS-Bench-101.",
+            "example_code": "nni.nas.benchmark.nasbench101.query_nb101_trial_stats, nni.nas.benchmark.nasbench101.Nb101TrialConfig"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.benchmark.NasBench201Benchmark(num_epochs=200, dataset='cifar100', metric='valid_acc', include_intermediates=False)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "num_epochs",
+                    "value": 200
+                },
+                {
+                    "name": "dataset",
+                    "value": "cifar100"
+                },
+                {
+                    "name": "metric",
+                    "value": "valid_acc"
+                },
+                {
+                    "name": "include_intermediates",
+                    "value": false
+                }
+            ],
+            "functionality": "Benchmark evaluator for NAS-Bench-201.",
+            "example_code": "Example code to use the API"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.benchmark.SlimBenchmarkSpace(mutables=None, **mutable_kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "Example model space without deep learning frameworks.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "nni.nas.benchmark.download_benchmark(benchmark, progress=True)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "benchmark",
+                    "value": "str"
+                }
+            ],
+            "functionality": "Download a converted benchmark.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "nni.nas.benchmark.load_benchmark(benchmark)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "benchmark",
+                    "value": "str"
+                }
+            ],
+            "functionality": "Load a benchmark as a database.",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "NAS-Bench-101",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "",
+            "example_code": ""
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.benchmark.nasbench101.Nb101IntermediateStats(*args, **kwargs)[source]¶\nIntermediate statistics for NAS-Bench-101.\n\ntrial¶\nThe exact trial where the intermediate result is produced.\n\nType:\nNb101TrialStats\n\ncurrent_epoch¶\nElapsed epochs when evaluation is done.\n\nType:\nint\n\ntrain_acc¶\nIntermediate accuracy on training data, ranging from 0 to 100.\n\nType:\nfloat\n\nvalid_acc¶\nIntermediate accuracy on validation data, ranging from 0 to 100.\n\nType:\nfloat\n\ntest_acc¶\nIntermediate accuracy on test data, ranging from 0 to 100.\n\nType:\nfloat\n\ntraining_time¶\nTime elapsed in seconds.\n\nType:\nfloat\n",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "trial",
+                    "value": "Nb101TrialStats"
+                },
+                {
+                    "name": "current_epoch",
+                    "value": "int"
+                },
+                {
+                    "name": "train_acc",
+                    "value": "float"
+                },
+                {
+                    "name": "valid_acc",
+                    "value": "float"
+                },
+                {
+                    "name": "test_acc",
+                    "value": "float"
+                },
+                {
+                    "name": "training_time",
+                    "value": "float"
+                }
+            ],
+            "functionality": "Intermediate statistics for NAS-Bench-101.",
+            "example_code": "class nni.nas.benchmark.nasbench101.Nb101IntermediateStats(trial=Nb101TrialStats, current_epoch=int, train_acc=float, valid_acc=float, test_acc=float, training_time=float)"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.benchmark.nasbench101.Nb101TrialConfig(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "arch",
+                    "value": {
+                        "type": "dict",
+                        "description": "A dict with keys op1, op2, … and input1, input2, … Vertices are enumerate from 0. Since node 0 is input node, it is skipped in this dict. Each op is one of nni.nas.benchmark.nasbench101.CONV3X3_BN_RELU, nni.nas.benchmark.nasbench101.CONV1X1_BN_RELU, and nni.nas.benchmark.nasbench101.MAXPOOL3X3. Each input is a list of previous nodes. For example input5 can be [0, 1, 3]."
+                    }
+                },
+                {
+                    "name": "num_vertices",
+                    "value": {
+                        "type": "int",
+                        "description": "Number of vertices (nodes) in one cell. Should be less than or equal to 7 in default setup."
+                    }
+                },
+                {
+                    "name": "hash",
+                    "value": {
+                        "type": "str",
+                        "description": "Graph-invariant MD5 string for this architecture."
+                    }
+                },
+                {
+                    "name": "num_epochs",
+                    "value": {
+                        "type": "int",
+                        "description": "Number of epochs planned for this trial. Should be one of 4, 12, 36, 108 in default setup."
+                    }
+                }
+            ],
+            "functionality": "Trial config for NAS-Bench-101.",
+            "example_code": "No example code provided."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.benchmark.nasbench101.Nb101TrialStats(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "arch",
+                    "value": "dict or None"
+                },
+                {
+                    "name": "num_epochs",
+                    "value": "int or None"
+                },
+                {
+                    "name": "isomorphism",
+                    "value": "boolean"
+                },
+                {
+                    "name": "reduction",
+                    "value": "str or None"
+                },
+                {
+                    "name": "include_intermediates",
+                    "value": "boolean"
+                }
+            ],
+            "functionality": "Computation statistics for NAS-Bench-101. Each corresponds to one trial. Each config has multiple trials with different random seeds, but unfortunately seed for each trial is unavailable. NAS-Bench-101 trains and evaluates on CIFAR-10 by default. The original training set is divided into 40k training images and 10k validation images, and the original validation set is used for test only.",
+            "example_code": "nni.nas.benchmark.nasbench101.query_nb101_trial_stats(arch, num_epochs, isomorphism=True, reduction=None, include_intermediates=False)[source]¶"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.benchmark.nasbench201.Nb201IntermediateStats(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "trial",
+                    "value": "Nb201TrialStats"
+                },
+                {
+                    "name": "current_epoch",
+                    "value": "int"
+                },
+                {
+                    "name": "train_acc",
+                    "value": "float"
+                },
+                {
+                    "name": "valid_acc",
+                    "value": "float"
+                },
+                {
+                    "name": "test_acc",
+                    "value": "float"
+                },
+                {
+                    "name": "ori_test_acc",
+                    "value": "float"
+                },
+                {
+                    "name": "train_loss",
+                    "value": "float or None"
+                },
+                {
+                    "name": "valid_loss",
+                    "value": "float or None"
+                },
+                {
+                    "name": "test_loss",
+                    "value": "float or None"
+                },
+                {
+                    "name": "ori_test_loss",
+                    "value": "float or None"
+                }
+            ],
+            "functionality": "Intermediate statistics for NAS-Bench-201.",
+            "example_code": "No example code provided."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.benchmark.nasbench201.Nb201TrialConfig(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "arch",
+                    "value": {
+                        "0_1": "nni.nas.benchmark.nasbench201.NONE",
+                        "0_2": "nni.nas.benchmark.nasbench201.SKIP_CONNECT",
+                        "0_3": "nni.nas.benchmark.nasbench201.CONV_1X1",
+                        "1_2": "nni.nas.benchmark.nasbench201.CONV_3X3",
+                        "1_3": "nni.nas.benchmark.nasbench201.AVG_POOL_3X3"
+                    }
+                },
+                {
+                    "name": "num_epochs",
+                    "value": [
+                        12,
+                        200
+                    ]
+                },
+                {
+                    "name": "num_channels",
+                    "value": 16
+                },
+                {
+                    "name": "num_cells",
+                    "value": 5
+                },
+                {
+                    "name": "dataset",
+                    "value": "cifar10-valid (training data is splited into 25k for training and 25k for validation, validation data is used for test), cifar10 (training data is used in training, validation data is splited into 5k for validation and 5k for testing), cifar100 (same protocol as cifar10), and imagenet16-120 (a subset of 120 classes in ImageNet, downscaled to 16x16, using training data for training, 6k images from validation set for validation and the other 6k for testing)"
+                }
+            ],
+            "functionality": "Trial config for NAS-Bench-201.",
+            "example_code": "No example code provided."
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.benchmark.nasbench201.Nb201TrialStats(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "arch",
+                    "value": "dict or None"
+                },
+                {
+                    "name": "num_epochs",
+                    "value": "int or None"
+                },
+                {
+                    "name": "dataset",
+                    "value": "str or None"
+                },
+                {
+                    "name": "reduction",
+                    "value": "str or None"
+                },
+                {
+                    "name": "include_intermediates",
+                    "value": "boolean"
+                }
+            ],
+            "functionality": "Computation statistics for NAS-Bench-201. Each corresponds to one trial.",
+            "example_code": "nni.nas.benchmark.nasbench201.query_nb201_trial_stats(arch, num_epochs, dataset, reduction=None, include_intermediates=False)[source]¶"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.benchmark.nds.NdsIntermediateStats(*args, **kwargs)[source]¶\nIntermediate statistics for NDS.\n\ntrial¶\nCorresponding trial.\n\nType:\nNdsTrialStats\n\ncurrent_epoch¶\nElapsed epochs.\n\nType:\nint\n\ntrain_loss¶\nCurrent cross entropy loss on training data. Can be NaN (None).\n\nType:\nfloat or None\n\ntrain_acc¶\nCurrent accuracy on training data, ranging from 0 to 100.\n\nType:\nfloat\n\ntest_acc¶\nCurrent accuracy on test data, ranging from 0 to 100.\n\nType:\nfloat\n",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "trial",
+                    "value": "NdsTrialStats"
+                },
+                {
+                    "name": "current_epoch",
+                    "value": "int"
+                },
+                {
+                    "name": "train_loss",
+                    "value": "float or None"
+                },
+                {
+                    "name": "train_acc",
+                    "value": "float"
+                },
+                {
+                    "name": "test_acc",
+                    "value": "float"
+                }
+            ],
+            "functionality": "Intermediate statistics for NDS.",
+            "example_code": "Example code to use the API"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.benchmark.nds.NdsTrialStats(*args, **kwargs)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [
+                {
+                    "name": "model_family",
+                    "value": "str or None"
+                },
+                {
+                    "name": "proposer",
+                    "value": "str or None"
+                },
+                {
+                    "name": "generator",
+                    "value": "str or None"
+                },
+                {
+                    "name": "model_spec",
+                    "value": "dict or None"
+                },
+                {
+                    "name": "cell_spec",
+                    "value": "dict or None"
+                },
+                {
+                    "name": "dataset",
+                    "value": "str or None"
+                },
+                {
+                    "name": "num_epochs",
+                    "value": "float or None"
+                },
+                {
+                    "name": "reduction",
+                    "value": "str or None"
+                },
+                {
+                    "name": "include_intermediates",
+                    "value": "boolean"
+                }
+            ],
+            "functionality": "Computation statistics for NDS. Each corresponds to one trial.",
+            "example_code": "nni.nas.benchmark.nds.query_nds_trial_stats(model_family, proposer, generator, model_spec, cell_spec, dataset, num_epochs=None, reduction=None, include_intermediates=False)[source]¶"
+        },
+        {
+            "user_name": "promachina",
+            "api_name": "Microsoft NNI API",
+            "api_call": "class nni.nas.utils.serializer.TorchSerializer(map_location=None)[source]¶",
+            "api_version": "1.0",
+            "api_arguments": [],
+            "functionality": "The serializer that utilizes torch.save() and torch.load() to save and load data.",
+            "example_code": ""
+        }
+    ]
+}
